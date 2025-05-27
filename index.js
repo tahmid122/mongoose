@@ -35,8 +35,18 @@ app.get("/", (req, res) => {
 //get products
 app.get("/products", async (req, res) => {
   try {
-    const products = await Product.find();
+    // const products = await Product.find({ price: { $lt: 1000 } });
+    // const products = await Product.find().countDocuments();
+    //acceding
+    // const products = await Product.find().sort({ price: 1 });
+    //descending
+    // const products = await Product.find().sort({ price: -1 });
+    //select
+    // const products = await Product.find()
+    //   .sort({ price: -1 })
+    //   .select({ title: 1 });
     // const products = await Product.find().limit(2);
+    const products = await Product.find();
     if (products) {
       res.status(200).send(products);
     } else {
@@ -75,6 +85,35 @@ app.post("/products", async (req, res) => {
     const newProduct = new Product({ title, price, description });
     const productData = await newProduct.save();
     res.status(201).send(productData);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
+//delete products
+app.delete("/products/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    // const product = await Product.deleteOne({ _id: id });
+    const product = await Product.findByIdAndDelete({ _id: id });
+    res.send(product);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
+//update
+app.put("/products/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updateProduct = await Product.findByIdAndUpdate(
+      { _id: id },
+      { $set: { price: 3000 } },
+      { new: true }
+    );
+    // const updateProduct = await Product.updateOne(
+    //   { _id: id },
+    //   { $set: { price: 2000 } }
+    // );
+    res.send(updateProduct);
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
